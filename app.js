@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const fs = require('fs');
 const routerTour = require('./routes/tourRoutes');
 const routerUser = require('./routes/userRoutes');
+const allErrorHandler = require('./utils/allErrorHandler');
+const AppError = require('./utils/apiErrors');
 app.use(express.json());
 
 if (process.env.NODE_ENV == 'developemnt') {
@@ -20,6 +22,12 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', routerTour);
 app.use('/api/v1/users', routerUser);
+
+app.all('/*any', (req, res, next) => {
+  next(new AppError(`Cant find  ${req.originalUrl} on this server`, 404));
+});
+
+app.use(allErrorHandler);
 
 app.get('/', (req, res) => {
   res.send(
